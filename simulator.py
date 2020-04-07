@@ -66,6 +66,7 @@ class Game:
 
         def go_to_jail(self, playerID):
             self.players[playerID].set_position(Board.getJail())
+            # Check if own any card.
 
     def print_stats(self):
         pass
