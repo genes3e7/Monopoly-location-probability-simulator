@@ -1,4 +1,5 @@
 import os
+import time
 import random
 from Board import Board
 from Decks import Decks
@@ -95,6 +96,8 @@ class Game:
                             self.players[playerID].to_reading()
                         elif card == 12:
                             self.players[playerID].to_boardwalk()
+                    elif pos == 30:
+                        self.go_to_jail(playerID)
 
                     if pos != self.players[playerID].get_position():
                         self.update_counter(
@@ -212,6 +215,9 @@ def play_game():
     return new_game.get_details()
 
 if __name__ == "__main__":
+    start_time = time.time()
+    print("Program Start")
+    
     temp = [[0 for i in range(40)], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     with concurrent.futures.ProcessPoolExecutor() as executor:
         processes = []
@@ -224,6 +230,9 @@ if __name__ == "__main__":
                 temp[j] += i.result()[j]
 
     print_stats(temp[0],temp[1],temp[2],temp[3],temp[4],temp[5],temp[6],temp[7],temp[8],temp[9],temp[10],temp[11],temp[12])
+    
+    print("--- %s seconds ---" % (time.time() - start_time))
+    
     # windows terminal will return nt
     # mac and linux terminals will return posix
     # pause so user can see printouts
