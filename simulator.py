@@ -167,33 +167,40 @@ class Game:
             self.chance
         )
 
-def print_stats(squares, brown, cyan, pink, orange, red, yellow, green, blue, station, utility, community, chance):
-    SQUARE = lambda a, b, c, d, e : "{:<3}: {:^43}:{:^8}:{:^8}:{:>6}".format(a, b, c, d, e)
-    TYPE = lambda a, b, c, d : "{:^9}:{:^8}:{:^8}:{:>6}".format(a, b, c, d)
-    print("No of Games: {}\n".format(PROCESSES * THREADS))
+def print_stats(data):
+    squares = data[0]
+    brown, cyan, pink, orange = data[1], data[2], data[3], data[4]
+    red, yellow, green, blue = data[5], data[6], data[7], data[8]
+    station, utility, community, chance = data[9], data[10], data[11], data[12]
 
+    SQUARE = lambda a, b, c, d : "{:<3}: {:^43}:{:^8}:{:>6}".format(a, b, c, d)
+    TYPE = lambda a, b, c : "{:^9}:{:^8}:{:>6}".format(a, b, c)
+
+    print("No of Games: {}".format(PROCESSES * THREADS))
     total = sum(squares)
-    print("{:^73}\n{}".format("Individual Squares", "-" * 73))
-    print(SQUARE("idx", "name", "Count", "Total", "(%)"))
-    print("-" * 73)
-    for i in range(len(Board().names)):
-        print(SQUARE(i, Board().names[i], squares[i], total, round((squares[i] / total) * 100, 2)))
+    print("Total Lands: {}\n".format(total))
 
-    print("\n{:^34}\n{}".format("Type", "-" * 34))
-    print(TYPE("Type", "Count", "Total", "(%)"))
-    print("-" * 34)
-    print(TYPE("brown", brown, total, round((brown / total) * 100, 2)))
-    print(TYPE("cyan", cyan, total, round((cyan / total) * 100, 2)))
-    print(TYPE("pink", pink, total, round((pink / total) * 100, 2)))
-    print(TYPE("orange", orange, total, round((orange / total) * 100, 2)))
-    print(TYPE("red", red, total, round((red / total) * 100, 2)))
-    print(TYPE("yellow", yellow, total, round((yellow / total) * 100, 2)))
-    print(TYPE("green", green, total, round((green / total) * 100, 2)))
-    print(TYPE("blue", blue, total, round((blue / total) * 100, 2)))
-    print(TYPE("station", station, total, round((station / total) * 100, 2)))
-    print(TYPE("utility", utility, total, round((utility / total) * 100, 2)))
-    print(TYPE("community", community, total, round((community / total) * 100, 2)))
-    print(TYPE("chance", chance, total, round((chance / total) * 100, 2)))
+    print("{:^64}\n{}".format("Individual Squares", "-" * 64))
+    print(SQUARE("idx", "name", "Count", "(%)"))
+    print("-" * 64)
+    for i in range(len(Board().names)):
+        print(SQUARE(i, Board().names[i], squares[i], round((squares[i] / total) * 100, 2)))
+
+    print("\n{:^25}\n{}".format("Type", "-" * 25))
+    print(TYPE("Type", "Count", "(%)"))
+    print("-" * 25)
+    print(TYPE("brown", brown, round((brown / total) * 100, 2)))
+    print(TYPE("cyan", cyan, round((cyan / total) * 100, 2)))
+    print(TYPE("pink", pink, round((pink / total) * 100, 2)))
+    print(TYPE("orange", orange, round((orange / total) * 100, 2)))
+    print(TYPE("red", red, round((red / total) * 100, 2)))
+    print(TYPE("yellow", yellow, round((yellow / total) * 100, 2)))
+    print(TYPE("green", green, round((green / total) * 100, 2)))
+    print(TYPE("blue", blue, round((blue / total) * 100, 2)))
+    print(TYPE("station", station, round((station / total) * 100, 2)))
+    print(TYPE("utility", utility, round((utility / total) * 100, 2)))
+    print(TYPE("community", community, round((community / total) * 100, 2)))
+    print(TYPE("chance", chance, round((chance / total) * 100, 2)))
 
 def single_process():
     temp = [[0 for i in range(40)], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -218,18 +225,18 @@ if __name__ == "__main__":
     start_time = time.time()
     print("Program Start")
     
-    temp = [[0 for i in range(40)], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    data = [[0 for i in range(40)], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     with concurrent.futures.ProcessPoolExecutor() as executor:
         processes = []
         for i in range(PROCESSES):
             processes.append(executor.submit(single_process))
         for i in processes:
             for j in range(len(i.result()[0])):
-                temp[0][j] += i.result()[0][j]
+                data[0][j] += i.result()[0][j]
             for j in range(1, len(i.result())):
-                temp[j] += i.result()[j]
+                data[j] += i.result()[j]
 
-    print_stats(temp[0],temp[1],temp[2],temp[3],temp[4],temp[5],temp[6],temp[7],temp[8],temp[9],temp[10],temp[11],temp[12])
+    print_stats(data)
     
     print("--- %s seconds ---" % (time.time() - start_time))
     
