@@ -1,6 +1,5 @@
 import random
 
-
 class Decks:
     def __init__(self):
         temp = [i for i in range(17)]

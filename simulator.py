@@ -1,12 +1,12 @@
 import os
-import numpy as np
-import math
 import random
 from Board import Board
 from Decks import Decks
 from Player import Player
 import concurrent.futures
 
+PROCESSES = 100
+THREADS = 1000
 
 class Game:
     def __init__(self):
@@ -165,23 +165,46 @@ class Game:
         )
 
 def print_stats(squares, brown, cyan, pink, orange, red, yellow, green, blue, station, utility, community, chance):
+    SQUARE = lambda a, b, c, d, e : "{:<3}: {:^43}:{:^8}:{:^8}:{:>6}".format(a, b, c, d, e)
+    TYPE = lambda a, b, c, d : "{:^9}:{:^8}:{:^8}:{:>6}".format(a, b, c, d)
+    print("No of Games: {}\n".format(PROCESSES * THREADS))
+
     total = sum(squares)
-    print("{:<3}: {:^43}:{:^8}:{:^8}:{:>6}".format("idx", "name", "Count", "Total", "(%)"))
+    print("{:^73}\n{}".format("Individual Squares", "-" * 73))
+    print(SQUARE("idx", "name", "Count", "Total", "(%)"))
+    print("-" * 73)
     for i in range(len(Board().names)):
-        print("{:<3}: {:^43}:{:^8}:{:^8}:{:>6}".format(i, Board().names[i], squares[i], total, round((squares[i] / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("Type", "Count", "Total", "(%)"))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("brown", brown, total, round((brown / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("cyan", cyan, total, round((cyan / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("pink", pink, total, round((pink / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("orange", orange, total, round((orange / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("red", red, total, round((red / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("yellow", yellow, total, round((yellow / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("green", green, total, round((green / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("blue", blue, total, round((blue / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("station", station, total, round((station / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("utility", utility, total, round((utility / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("community", community, total, round((community / total) * 100, 2)))
-    print("{:^9}:{:^8}:{:^8}:{:>6}".format("chance", chance, total, round((chance / total) * 100, 2)))
+        print(SQUARE(i, Board().names[i], squares[i], total, round((squares[i] / total) * 100, 2)))
+
+    print("\n{:^34}\n{}".format("Type", "-" * 34))
+    print(TYPE("Type", "Count", "Total", "(%)"))
+    print("-" * 34)
+    print(TYPE("brown", brown, total, round((brown / total) * 100, 2)))
+    print(TYPE("cyan", cyan, total, round((cyan / total) * 100, 2)))
+    print(TYPE("pink", pink, total, round((pink / total) * 100, 2)))
+    print(TYPE("orange", orange, total, round((orange / total) * 100, 2)))
+    print(TYPE("red", red, total, round((red / total) * 100, 2)))
+    print(TYPE("yellow", yellow, total, round((yellow / total) * 100, 2)))
+    print(TYPE("green", green, total, round((green / total) * 100, 2)))
+    print(TYPE("blue", blue, total, round((blue / total) * 100, 2)))
+    print(TYPE("station", station, total, round((station / total) * 100, 2)))
+    print(TYPE("utility", utility, total, round((utility / total) * 100, 2)))
+    print(TYPE("community", community, total, round((community / total) * 100, 2)))
+    print(TYPE("chance", chance, total, round((chance / total) * 100, 2)))
+
+def single_process():
+    temp = [[0 for i in range(40)], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        threads = []
+        for i in range(THREADS):
+            threads.append(executor.submit(play_game))
+        for i in threads:
+            for j in range(len(i.result()[0])):
+                temp[0][j] += i.result()[0][j]
+            for j in range(1, len(i.result())):
+                temp[j] += i.result()[j]
+
+    return temp
 
 def play_game():
     new_game = Game()
@@ -190,11 +213,11 @@ def play_game():
 
 if __name__ == "__main__":
     temp = [[0 for i in range(40)], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        threads = []
-        for i in range(1000):
-            threads.append(executor.submit(play_game))
-        for i in threads:
+    with concurrent.futures.ProcessPoolExecutor() as executor:
+        processes = []
+        for i in range(PROCESSES):
+            processes.append(executor.submit(single_process))
+        for i in processes:
             for j in range(len(i.result()[0])):
                 temp[0][j] += i.result()[0][j]
             for j in range(1, len(i.result())):
