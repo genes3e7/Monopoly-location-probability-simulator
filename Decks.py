@@ -3,11 +3,13 @@ import random
 
 class Decks:
     def __init__(self):
-        self.community_deck = random.shuffle(list(i for i in range(17)))
-        self.chance_deck = random.shuffle(list(i for i in range(17)))
+        temp = [i for i in range(17)]
+        random.shuffle(temp)
+        self.community_deck = temp
+        temp = [i for i in range(16)]
+        random.shuffle(temp)
+        self.chance_deck = temp
         self.init_names()
-        self.chance = 0
-        self.community = 0
 
     def init_names(self):
         self.community_deck_names = {
@@ -30,22 +32,22 @@ class Decks:
             16: "You inherit $100."
         }
         self.chance_deck_names = {
-            1: "Advance to Go. (Collect $200)",
-            2: "Advance to Illinois Ave. If you pass Go, collect $200.",
-            3: "Advance to St. Charles Place. If you pass Go, collect $200.",
-            4: "Advance token to nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total 10 times the amount thrown.",
-            5: "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.",
-            6: "Bank pays you dividend of $50.",
-            7: "Get out of Jail Free. This card may be kept until needed, or traded/sold.",
-            8: "Go Back Three Spaces.",
-            9: "Go to Jail. Go directly to Jail. Do not pass GO, do not collect $200.",
-            10: "Make general repairs on all your property: For each house pay $25, For each hotel pay $100.",
-            11: "Pay poor tax of $15",
-            12: "Take a trip to Reading Railroad.",
-            13: "Take a walk on the Boardwalk. Advance token to Boardwalk.",
-            14: "You have been elected Chairman of the Board. Pay each player $50.",
-            15: "Your building and loan matures. Receive $150.",
-            16: "You have won a crossword competition. Collect $100."
+            0: "Advance to Go. (Collect $200)",
+            1: "Advance to Illinois Ave. If you pass Go, collect $200.",
+            2: "Advance to St. Charles Place. If you pass Go, collect $200.",
+            3: "Advance token to nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner a total 10 times the amount thrown.",
+            4: "Advance token to the nearest Railroad and pay owner twice the rental to which he/she is otherwise entitled. If Railroad is unowned, you may buy it from the Bank.",
+            5: "Bank pays you dividend of $50.",
+            6: "Get out of Jail Free. This card may be kept until needed, or traded/sold.",
+            7: "Go Back Three Spaces.",
+            8: "Go to Jail. Go directly to Jail. Do not pass GO, do not collect $200.",
+            9: "Make general repairs on all your property: For each house pay $25, For each hotel pay $100.",
+            10: "Pay poor tax of $15",
+            11: "Take a trip to Reading Railroad.",
+            12: "Take a walk on the Boardwalk. Advance token to Boardwalk.",
+            13: "You have been elected Chairman of the Board. Pay each player $50.",
+            14: "Your building and loan matures. Receive $150.",
+            15: "You have won a crossword competition. Collect $100."
         }
 
     def get_names(self, deck, id):
@@ -61,12 +63,14 @@ class Decks:
 
     def draw_chanceDeck(self):
         ans = self.chance_deck.pop(0)
-        if ans != 7:
+        if ans != 6:
             self.chance_deck.append(ans)
         return ans
 
     def return_community(self):
-        self.community_deck.append(4)
+        if not(4 in self.community_deck):
+            self.community_deck.append(4)
 
     def return_chance(self):
-        self.chance_deck.append(7)
+        if not(6 in self.chance_deck):
+            self.chance_deck.append(6)
